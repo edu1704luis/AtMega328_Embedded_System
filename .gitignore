@@ -1,3 +1,5 @@
+timer_counter_test/
+ADC_test/
 build/
 *.o
 *.elf
