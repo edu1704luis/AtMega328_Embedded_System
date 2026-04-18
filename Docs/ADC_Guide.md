@@ -1,6 +1,6 @@
 # GUIDE USE ADC
 
- To activate the ADC the bit PRADC (Power Reduction ADC) from register XXXX, must be disabled by writing logical 0. And bit ADEN(ADC Enable) from register ADCSRA.
+ To activate the ADC the bit PRADC (Power Reduction ADC) from register PRR, must be disabled by writing logical 0. And bit ADEN(ADC Enable) from register ADCSRA ste to 1.
 
 __Note: In slepp modes ADEN must be clared.__
 
@@ -12,35 +12,35 @@ __Note: In slepp modes ADEN must be clared.__
 
     | Reference         | Reg Selection |
     | -------------     |:-------------:|
-    | 1.1 Volts         | right foo     |
-    | AV<sub>cc</sub>   | right bar     |
-    | AREF              | right baz     |
+    | 1.1 Volts         | ADMUX     |
+    | AV<sub>cc</sub>   | ADMUX     |
+    | AREF              | ADMUX     |
 
-* ADC data registers ADCH and ADCL right adjusted, left adjusted by setting the ADLAR bit in ADMUX. 
+* ADC data registers [ADCH](#adc-data-register) and [ADCL](#adc-data-register) right adjusted, left adjusted by setting the ADLAR bit in [ADMUX](#adc-multiplexer-selection-register). 
 
 ## Starting a Conversion
 
 ### Single Converison 
 |  Bits | Register | Status |
 | ------|:--------:|:------:|
-| PRADC | XXXX     | 0      |
-| ADSC  | XXXX     | 1      |
-| PRADC | XXXX     | 0      |
+| PRADC | PRR      | 0      |
+| ADSC  | [ADCSRA](#adc-control-and-status-register-a) | 1      |
 
 __Note: ADSC bit is cleared by hardware when the conversio is complete.__
 
 ### Trigger Conversion
 |  Bits | Register | Status |
 | ------|:--------:|:------:|
-| ADATE | ADCRSA   | 0      |
-| ADTS  | ADCSRB   | 1      |
-| PRADC | XXXX     | 0      |
+| PRADC | PRR      | 0      |
+| ADATE | [ADCSRA](#adc-control-and-status-register-a) | 1      |
+| ADTS  | [ADCSRB](#adc-control-and-status-register-b) | 1      |
+
 
 ## Prescaling and Conversion Timing
 
 * Clock Frequency 50Khz- 200Khz, more than 200kz if a lower resolution of 10 bits.
 
-* ADC module prescaler is set by bits ADPS2:0 in register ADCSRA; the ADEN bit acts as a prescaler clock enable.
+* ADC module prescaler is set by bits ADPS2:0 in register [ADCSRA](#adc-control-and-status-register-a); the ADEN bit acts as a prescaler clock enable.
 
 * When a conversion is complete, the result is written in ADC data registers and ADIF is set. In single conversion mode, ADSC is cleared simultaneosly and config again ADSC init a new convetion.
 
@@ -50,10 +50,10 @@ __Note: ADSC bit is cleared by hardware when the conversio is complete.__
 
 ## Changing channel and reference selection
 
-The bits MUXn and REFS1:0 in the ADMUX register are update before a new even converision inits. ADIF is an flag thet conversion is complete.
+The bits MUXn and REFS1:0 in the [ADMUX](#adc-multiplexer-selection-register) register are update before a new even converision inits. ADIF is an flag thet conversion is complete.
 
 Warning! in trigger mode any change to ADMUX must be in any of this conditions:
-* When ADATE and ADEN is cleared.
+* When ADATE and ADEN (in [ADCSRA](#adc-control-and-status-register-a)) is cleared.
 * Diring converion, minimun one ADC clock cycle after the trigger event.
 * After a converesion, before the interrupt Flag used as trigger sourse is cleared. 
 
