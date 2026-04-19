@@ -23,7 +23,7 @@ __Note: In slepp modes ADEN must be clared.__
 ### Single Converison 
 |  Bits | Register | Status |
 | ------|:--------:|:------:|
-| PRADC | PRR      | 0      |
+| PRADC | [PRR](/Docs/Power_and_sleep_modes.md#power-reduction-register)| 0      |
 | ADSC  | [ADCSRA](#adc-control-and-status-register-a) | 1      |
 
 __Note: ADSC bit is cleared by hardware when the conversio is complete.__
@@ -31,11 +31,26 @@ __Note: ADSC bit is cleared by hardware when the conversio is complete.__
 ### Trigger Conversion
 |  Bits | Register | Status |
 | ------|:--------:|:------:|
-| PRADC | PRR      | 0      |
+| PRADC | [PRR](/Docs/Power_and_sleep_modes.md#power-reduction-register)| 0      |
 | ADATE | [ADCSRA](#adc-control-and-status-register-a) | 1      |
-| ADTS  | [ADCSRB](#adc-control-and-status-register-b) | 1      |
+| ADTS*  | [ADCSRB](#adc-control-and-status-register-b) | 1      |
 
+When a positive edge occurs on the selected trigger signal, the ADC prescaler is reset and 
+a conversion is started. This provides a method of starting conversions at fixed intervals. 
+If the trigger signal still is set when the conversion completes, a new conversion will not 
+be started. If another positive edge occurs on the trigger signal during conversion, the 
+edge will be ignored.
 
+__*Note: ADTS2:0 select the trigger sourse from the [list](#adts_table).__
+
+### Free Running mode
+
+Using the ADC interrup flag as trigger sourse makes the ADC start a new conversion as soon 
+as the ongoing conversion has finished.
+
+If auto triggering is enabled, single conversions can be started by writing ADSC in ADCSRA 
+to one. ADSC can also be used to determine if a conversion is in progress. The ADSC bit 
+will be read as one during a conversion, independently of how the conversion was started.
 ## Prescaling and Conversion Timing
 
 * Clock Frequency 50Khz- 200Khz, more than 200kz if a lower resolution of 10 bits.
@@ -80,7 +95,7 @@ VREF can be selected as either AVCC, internal 1.1V reference, or external AREF p
 
 
     |REFS1:0| Voltage Reference selection|
-    |-------|:--------------------------:|
+    |-------|:---------------------------|
     |  00   |AREF external reference     |
     |  01   |AV<sub>CC</sub> with ecternal capacitor to AREF pin |
     |  10   | Reserved                   |
@@ -91,7 +106,7 @@ VREF can be selected as either AVCC, internal 1.1V reference, or external AREF p
 * __MUX3:0__ Analog Channel Selection Bits
 
     | MUX3:0| Single Ended Input|
-    |-------|:-----------------:|
+    |-------|:------------------|
     | 0000  |       ADC0        |
     | 0001  |       ADC1        |
     | 0010  |       ADC2        |
@@ -124,7 +139,7 @@ VREF can be selected as either AVCC, internal 1.1V reference, or external AREF p
 * __ADPS2:0__ ADC prescaler select bits 
 
     |ADPS2:0| Division Factor   |
-    |-------|:-----------------:|
+    |-------|:------------------|
     | 000   |       2           |
     | 001   |       2           |
     | 010   |       4           |
@@ -142,9 +157,10 @@ VREF can be selected as either AVCC, internal 1.1V reference, or external AREF p
 
 * __ACME__ see register in analog comparator mode
 
+<a id="adts_table"></a>
 * __ADTS2:0__ ADC auto trigger sourse
     |ADTS2:0| Trigger Sourse    |
-    |-------|:-----------------:|
+    |-------|:------------------|
     | 000   | Free running mode |
     | 001   | Analog Comparator |
     | 010   | External interrupt request 0   |

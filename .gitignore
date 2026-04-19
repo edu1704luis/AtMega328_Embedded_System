@@ -1,5 +1,6 @@
 timer_counter_test/
 7seg/
+Led_pull_up/
 ADC_test/
 build/
 *.o
